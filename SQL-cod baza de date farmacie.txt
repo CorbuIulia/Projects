@@ -1,0 +1,591 @@
+--PROIECT
+
+--CREARE TABELE
+
+
+drop table clienti_p on delete cascade;
+drop table retete_p on delete cascade;
+drop table producatori_p on delete cascade;
+drop table medicamente_p on delete cascade;
+drop table detalii_retete_p on delete cascade;
+drop table carduri_fidelitate_p on delete cascade;
+
+create table clienti_p
+(
+id_client_p number(6) constraint pk_clienti primary key,
+nume_p varchar2(20) constraint nn_nume not null,
+prenume_p varchar2(20) constraint nn_prenume not null,
+data_nasterii_p date,
+sex_p varchar2(1) constraint nn_sex not null,
+telefon_p varchar2(20) constraint nn_telefon not null,
+email_client_p varchar2(30) constraint uq_email unique
+constraint ck_email check(email_client_p like '%@%.%'),
+localitate_p varchar2(20) constraint nn_localitate not null
+);
+
+create table retete_p
+(
+cod_reteta_p number(6) constraint pk_retete primary key,
+id_client_p number(6) constraint fk_clienti references clienti_p(id_client_p) on delete cascade,
+nume_emitent_p varchar2(20) constraint nn_nume_emitent not null,
+diagnostic_p varchar2(20) constraint nn_diagnostic not null,
+data_eliberare_p date,
+procent_compensare_p number(3) constraint nn_procent_compensare not null
+);
+
+create table producatori_p
+(
+id_producator_p number(6) constraint pk_producatori primary key,
+nume_producator_p varchar2(20) constraint nn_nume_producator not null
+);
+
+create table medicamente_p
+(
+cod_medicament_p number(6) constraint pk_medicamente primary key,
+id_producator_p number(6) constraint fk_producatori references producatori_p(id_producator_p) on delete cascade,
+denumire_medicament_p varchar2(30) constraint nn_medicament not null,
+stoc_p number(10) constraint nn_stoc not null,
+substanta_activa_p varchar2(30) constraint nn_substanta_activa not null,
+pret_lista_p number(8,2) constraint nn_pret_lista not null
+);
+
+create table detalii_retete_p
+(
+cod_reteta_p number(6) constraint fk_retete references retete_p(cod_reteta_p) on delete cascade,
+cod_medicament_p number(6) constraint fk_medicamente references medicamente_p(cod_medicament_p) on delete cascade,
+doza_p number(8,2) constraint nn_doza not null,
+cantitate_p number(10) constraint nn_cantitate not null,
+pret_p number(8,2) constraint nn_pret not null,
+constraint pk_detalii primary key(cod_reteta_p, cod_medicament_p) 
+);
+
+create table carduri_fidelitate_p
+(
+id_card_p number(6) constraint pk_carduri_fidelitate primary key,
+id_client_p number(6) constraint fk_clienti_1 references clienti_p(id_client_p)on delete cascade,
+discount_p number(3) constraint nn_discount not null
+);
+
+
+
+
+--POPULARE TABELE
+
+insert into clienti_p(id_client_p,nume_p,prenume_p,data_nasterii_p,sex_p,telefon_p,email_client_p,localitate_p)
+values(100,'Popescu', 'George', to_date('05-03-1996', 'dd-mm-yyyy'), 'M', '0721765544', 'georgepopescu07@gmail.com','Pitesti');
+
+insert into clienti_p(id_client_p,nume_p,prenume_p,data_nasterii_p,sex_p,telefon_p,localitate_p)
+values(101,'Stoica', 'Simona', to_date('26-07-2000', 'dd-mm-yyyy'), 'F', '0787540400','Pitesti');
+
+insert into clienti_p(id_client_p,nume_p,prenume_p,data_nasterii_p,sex_p,telefon_p,email_client_p,localitate_p)
+values(102,'Ionescu', 'Gabriela', to_date('15-01-1999', 'dd-mm-yyyy'), 'F', '0770675890', 'ionescuG@yahoo.com','Bucuresti');
+
+insert into clienti_p(id_client_p,nume_p,prenume_p,data_nasterii_p,sex_p,telefon_p,email_client_p,localitate_p)
+values(103,'Cojocaru', 'Maria', to_date('20-05-1998', 'dd-mm-yyyy'), 'F', '0771948576', 'mariaC@yahoo.com','Bacau');
+
+insert into clienti_p(id_client_p,nume_p,prenume_p,data_nasterii_p,sex_p,telefon_p,email_client_p,localitate_p)
+values(104,'Bratu', 'Vasile', to_date('10-11-1997', 'dd-mm-yyyy'), 'M', '0770947586', 'BratuV@yahoo.com','Sibiu');
+
+insert into clienti_p(id_client_p,nume_p,prenume_p,data_nasterii_p,sex_p,telefon_p,localitate_p)
+values(105,'Vintila', 'Aurel', to_date('12-09-1998', 'dd-mm-yyyy'), 'M', '0745859670','Bascov');
+
+insert into clienti_p(id_client_p,nume_p,prenume_p,data_nasterii_p,sex_p,telefon_p,localitate_p)
+values(106,'Vintila', 'Ana', to_date('08-09-2000', 'dd-mm-yyyy'), 'F', '0741875647','Bradu');
+
+insert into clienti_p(id_client_p,nume_p,prenume_p,data_nasterii_p,sex_p,telefon_p,email_client_p,localitate_p)
+values(107,'Popescu', 'Andrei', to_date('05-01-1997', 'dd-mm-yyyy'), 'M', '0721830947', 'AndreiP@gmail.com','Pitesti');
+
+insert into clienti_p(id_client_p,nume_p,prenume_p,data_nasterii_p,sex_p,telefon_p,email_client_p,localitate_p)
+values(108,'Apostol', 'Ana', to_date('05-11-1996', 'dd-mm-yyyy'), 'F', '0721234947', 'ApostolA@gmail.com','Bascov');
+
+insert into clienti_p(id_client_p,nume_p,prenume_p,data_nasterii_p,sex_p,telefon_p,localitate_p)
+values(109,'Barbu', 'Costi', to_date('10-12-1995', 'dd-mm-yyyy'), 'M', '0770384747','Costinesti');
+
+
+
+
+insert into retete_p(cod_reteta_p, id_client_p, nume_emitent_p,diagnostic_p,data_eliberare_p, procent_compensare_p)
+values(10, 100, 'Badea Ion', 'sinuzita',to_date('26-07-2020', 'dd-mm-yyyy'), 40);
+
+insert into retete_p(cod_reteta_p, id_client_p, nume_emitent_p,diagnostic_p,data_eliberare_p, procent_compensare_p)
+values(11, 101, 'Nedelcu Ana', 'diabet',to_date('06-10-2020', 'dd-mm-yyyy'), 30);
+
+insert into retete_p(cod_reteta_p, id_client_p, nume_emitent_p,diagnostic_p,data_eliberare_p, procent_compensare_p)
+values(12, 103, 'Condur Ion', 'hipertensiune',to_date('05-04-2020', 'dd-mm-yyyy'), 20);
+
+insert into retete_p(cod_reteta_p, id_client_p, nume_emitent_p,diagnostic_p,data_eliberare_p, procent_compensare_p)
+values(13, 104, 'Sanda Oana', 'reumatism',to_date('16-12-2019', 'dd-mm-yyyy'), 50);
+
+insert into retete_p(cod_reteta_p, id_client_p, nume_emitent_p,diagnostic_p,data_eliberare_p, procent_compensare_p)
+values(14, 105, 'Popica Ana', 'dermatita',to_date('06-11-2019', 'dd-mm-yyyy'), 35);
+
+insert into retete_p(cod_reteta_p, id_client_p, nume_emitent_p,diagnostic_p,data_eliberare_p, procent_compensare_p)
+values(16, 106, 'Badea Ion', 'sinuzita',to_date('15-09-2019', 'dd-mm-yyyy'), 20);
+
+insert into retete_p(cod_reteta_p, id_client_p, nume_emitent_p,diagnostic_p,data_eliberare_p, procent_compensare_p)
+values(17, 106, 'Popica Ana', 'hipertensiune',to_date('15-04-2020', 'dd-mm-yyyy'), 25);
+
+insert into retete_p(cod_reteta_p, id_client_p, nume_emitent_p,diagnostic_p,data_eliberare_p, procent_compensare_p)
+values(18, 102, 'Sanda Oana', 'hipertensiune',to_date('03-02-2020', 'dd-mm-yyyy'), 15);
+
+insert into retete_p(cod_reteta_p, id_client_p, nume_emitent_p,diagnostic_p,data_eliberare_p, procent_compensare_p)
+values(19, 107, 'Bratu Costel', 'diabet',to_date('05-04-2020', 'dd-mm-yyyy'), 25);
+
+insert into retete_p(cod_reteta_p, id_client_p, nume_emitent_p,diagnostic_p,data_eliberare_p, procent_compensare_p)
+values(20, 104, 'Barbu Claudiu', 'dermatita',to_date('16-02-2020', 'dd-mm-yyyy'), 35);
+
+--stearsa
+insert into retete_p(cod_reteta_p, id_client_p, nume_emitent_p,diagnostic_p,data_eliberare_p, procent_compensare_p)
+values(15, 105, 'Burlacu Andrei', 'hipertensiune',to_date('25-01-2020', 'dd-mm-yyyy'), 25);
+
+
+
+
+
+insert into producatori_p(id_producator_p, nume_producator_p)
+values(20, 'Pharma SRL');
+
+insert into producatori_p(id_producator_p, nume_producator_p)
+values(21, 'Medicine SA');
+
+insert into producatori_p(id_producator_p, nume_producator_p)
+values(22, 'Farmaceutic SRL');
+
+insert into producatori_p(id_producator_p, nume_producator_p)
+values(23, 'MedYou SA');
+
+insert into producatori_p(id_producator_p, nume_producator_p)
+values(24, 'DrLife SRL');
+
+insert into producatori_p(id_producator_p, nume_producator_p)
+values(25, 'LifeMed SRL');
+
+insert into producatori_p(id_producator_p, nume_producator_p)
+values(26, 'ProPharma SA');
+
+insert into producatori_p(id_producator_p, nume_producator_p)
+values(28, 'PhFarm SA');
+
+--sters
+insert into producatori_p(id_producator_p, nume_producator_p)
+values(27, 'Farmcare SA');
+
+
+
+insert into medicamente_p(cod_medicament_p, id_producator_p, denumire_medicament_p, stoc_p, substanta_activa_p, pret_lista_p)
+values(50, 20, 'Sinosun', 105, 'N-acetilcisteina', 50);
+
+insert into medicamente_p(cod_medicament_p, id_producator_p, denumire_medicament_p, stoc_p, substanta_activa_p, pret_lista_p)
+values(51, 22, 'Diabetyn', 99, 'Schinduf',35.6 );
+
+insert into medicamente_p(cod_medicament_p, id_producator_p, denumire_medicament_p, stoc_p, substanta_activa_p, pret_lista_p)
+values(52, 21, 'Augumentin', 200, 'Amoxicilina',43 );
+
+insert into medicamente_p(cod_medicament_p, id_producator_p, denumire_medicament_p, stoc_p, substanta_activa_p, pret_lista_p)
+values(53, 23, 'Cardiol', 46, 'Arjuna',120 );
+
+insert into medicamente_p(cod_medicament_p, id_producator_p, denumire_medicament_p, stoc_p, substanta_activa_p, pret_lista_p)
+values(54, 24, 'Artrocalm', 87, 'Glucozamina',30 );
+
+
+insert into medicamente_p(cod_medicament_p, id_producator_p, denumire_medicament_p, stoc_p, substanta_activa_p, pret_lista_p)
+values(55, 26, 'Zinnat', 205, 'Cefuroxima',35 );
+
+insert into medicamente_p(cod_medicament_p, id_producator_p, denumire_medicament_p, stoc_p, substanta_activa_p, pret_lista_p)
+values(56, 26, 'Nurofen', 78, 'Ibuprofen',20.1 );
+
+insert into medicamente_p(cod_medicament_p, id_producator_p, denumire_medicament_p, stoc_p, substanta_activa_p, pret_lista_p)
+values(57, 24, 'Parasinus', 145, 'Paracetamol',19 );
+
+insert into medicamente_p(cod_medicament_p, id_producator_p, denumire_medicament_p, stoc_p, substanta_activa_p, pret_lista_p)
+values(58, 25, 'Nebilet', 134, 'Nebivolol',20 );
+
+
+
+
+insert into detalii_retete_p(cod_reteta_p, cod_medicament_p, doza_p,cantitate_p,pret_p)
+values(10, 50,20.1 ,1, 55);
+
+insert into detalii_retete_p(cod_reteta_p, cod_medicament_p, doza_p,cantitate_p,pret_p)
+values(11, 51, 14.3,2, 40.1);
+
+insert into detalii_retete_p(cod_reteta_p, cod_medicament_p, doza_p,cantitate_p,pret_p)
+values(12, 53,56 ,2, 150);
+
+insert into detalii_retete_p(cod_reteta_p, cod_medicament_p, doza_p,cantitate_p,pret_p)
+values(13,54,19 ,3, 37.6);
+
+insert into detalii_retete_p(cod_reteta_p, cod_medicament_p, doza_p,cantitate_p,pret_p)
+values(14,52,30.7 ,1, 48);
+
+insert into detalii_retete_p(cod_reteta_p, cod_medicament_p, doza_p,cantitate_p,pret_p)
+values(16,57,33.2 ,2, 25);
+
+insert into detalii_retete_p(cod_reteta_p, cod_medicament_p, doza_p,cantitate_p,pret_p)
+values(17,53,50 ,1, 150);
+
+insert into detalii_retete_p(cod_reteta_p, cod_medicament_p, doza_p,cantitate_p,pret_p)
+values(18,58,5 ,2, 25.6);
+
+insert into detalii_retete_p(cod_reteta_p, cod_medicament_p, doza_p,cantitate_p,pret_p)
+values(19,51,15 ,1, 40.1);
+
+insert into detalii_retete_p(cod_reteta_p, cod_medicament_p, doza_p,cantitate_p,pret_p)
+values(20,55,50 ,1, 39.9);
+
+
+
+
+
+
+
+insert into carduri_fidelitate_p(id_card_p, id_client_p, discount_p)
+values(1, 100, 20);
+
+insert into carduri_fidelitate_p(id_card_p, id_client_p, discount_p)
+values(2, 101, 30);
+
+insert into carduri_fidelitate_p(id_card_p, id_client_p, discount_p)
+values(3, 102, 10);
+
+insert into carduri_fidelitate_p(id_card_p, id_client_p, discount_p)
+values(4, 104, 15);
+
+insert into carduri_fidelitate_p(id_card_p, id_client_p, discount_p)
+values(5, 105, 25);
+
+
+
+
+
+
+--PARTEA 2
+
+
+--comenzi de actualizare:insert/update/delete
+
+--1 sa se stearga producatorul cu id_ul 27
+
+delete from producatori_p
+where id_producator_p=27;
+
+--2 sa se modifice numarul de telefon al clientului Bratu Vasile cu 0743768976
+
+update clienti_p
+set telefon_p='0743768976'
+where nume_p='Bratu' and prenume_p='Vasile';
+
+--3 sa se mareasca discount-ul cu 5 procente al cardului cu id_card = 2 
+
+update carduri_fidelitate_p
+set discount_p=discount_p+5
+where id_card_p=2;
+
+
+--4 sa se micsoreze stocul medicamentului Sinosun cu 10
+
+update medicamente_p
+set stoc_p=stoc_p-10
+where denumire_medicament_p='Sinosun';
+
+--5 sa se stearga reteta cu codul 15
+delete from retete_p
+where cod_reteta_p=15;
+
+--6 sa se insereze in tabela carduri_fidelitate un card cu id_card 6, id_client 103 si discount 20
+ 
+insert into carduri_fidelitate_p(id_card_p, id_client_p, discount_p)
+values(6, 103, 20);
+
+
+
+
+
+--interogari(select cu jonctiuni si grupari)
+
+--1 sa se afiseze numele producatorilor si numele medicamentelor cu care a fost aprovizionata farmacia
+
+select  p.nume_producator_p, m.denumire_medicament_p
+from producatori_p p, medicamente_p m
+where p.id_producator_p=m.id_producator_p;
+
+--2 sa se afiseze numele producatorului si numarul de medicamente(distincte) cu care a aprovizionat farmacia
+
+select p.nume_producator_p, count(m.cod_medicament_p) nr_med
+from producatori_p p, medicamente_p m
+where p.id_producator_p=m.id_producator_p
+group by p.nume_producator_p;
+
+
+--3 sa se afiseze numele si prenumele clientului, diagnosticul dat, denumirea medicamentului prescris, precum si doza acestuia intr-un mesaj corespunzator
+
+
+select 'Clientul ' || c.nume_p ||' '|| c.prenume_p ||' are diagnosticul: ' ||  r.diagnostic_p ||
+ ' si este prescris medicamentul: ' || m.denumire_medicament_p || ' in doza de ' || dr.doza_p || ' mg.'
+from clienti_p c, retete_p r, medicamente_p m, detalii_retete_p dr
+where c.id_client_p=r.id_client_p and r.cod_reteta_p=dr.cod_reteta_p and dr.cod_medicament_p=m.cod_medicament_p;
+
+
+--4 sa se afiseze id_clientului, codul retetei,sexul clientului si procentul de compensare marit astfel:
+daca clientul este de sex feminin procentul creste cu 10%
+altfel cu 5%(barbat)
+
+select c.id_client_p, r.cod_reteta_p ,c.sex_p, case
+when c.sex_p='F' then r.procent_compensare_p*1.1
+else r.procent_compensare_p*1.05
+end procent_compensare_nou
+from clienti_p c, retete_p r
+where c.id_client_p=r.id_client_p;
+
+--5 sa se afiseze denumirea si doza pentru medicamentul cu denumirea 'Sinosun'
+
+select m.denumire_medicament_p, dr.doza_p
+from medicamente_p m, detalii_retete_p dr
+where m.cod_medicament_p=dr.cod_medicament_p and m.denumire_medicament_p='Sinosun';
+
+
+--6 Sa se afiseze id-ul, numele si prenumele clientilor care nu au carduri de fidelitate
+select c.id_client_p, c.nume_p, c.prenume_p
+from clienti_p c,carduri_fidelitate_p f
+where c.id_client_p=f.id_client_p(+)
+minus
+select c.id_client_p, c.nume_p, c.prenume_p
+from clienti_p c,carduri_fidelitate_p f
+where c.id_client_p=f.id_client_p;
+
+
+
+--1 sa se afiseze numele si numarul de clienti cu acelasi nume daca acesta este mai mare sau egal cu 2
+
+select nume_p, count(id_client_p) nr_clienti
+from clienti_p
+group by nume_p
+having count(id_client_p)>=2;
+
+--2 sa se afiseze numarul de clienti in functie de sex
+
+select sex_p, count(id_client_p) nr_clienti
+from clienti_p
+group by sex_p;
+
+--3 sa se afiseze numarul de clienti in ordine descrescatoare in functie de diagnosticul dat
+
+select diagnostic_p, count(id_client_p)
+from retete_p
+group by diagnostic_p
+order by count(id_client_p) desc;
+
+--4 sa se afiseze numarul de clienti in functie de anul nasterii, in ordinea crescatoare a anului
+
+select count(id_client_p) nr_clienti, extract(year from data_nasterii_p) anul_nasterii
+from clienti_p 
+group by extract(year from data_nasterii_p)
+order by extract(year from data_nasterii_p);
+
+
+
+
+
+
+
+--interogari cu subcereri 
+
+--1 sa se afiseze discount-ul de pe card, numele si prenumele clientului care are pe card un discount mai mare decat media generala a discount-urilor
+
+select cf.discount_p, c.nume_p, c.prenume_p
+from clienti_p c, carduri_fidelitate_p cf
+where c.id_client_p=cf.id_client_p and cf.discount_p>(select avg(discount_p) from carduri_fidelitate_p);
+
+
+--2 sa se afiseze codul retetei, procentul de compensare si procentul de compensare marit cu 5 pentru retetele care au doza mai mare sau egala cu 20
+
+select cod_reteta_p, procent_compensare_p procent_existent, procent_compensare_p+5 procent_nou
+from retete_p
+where cod_reteta_p in (select cod_reteta_p from detalii_retete_p
+                   where doza_p>=20);
+
+
+--3 sa se afiseze id-ul,numele, prenumele si localitatea clientilor care sunt din aceeasi localitate cu Popescu Andrei
+
+select id_client_p, nume_p, prenume_p, localitate_p
+from clienti_p
+where localitate_p=(select localitate_p from clienti_p
+                     where nume_p='Popescu' and prenume_p='Andrei');
+
+
+
+--4 sa se afiseze primele 2 retete cu valoarea cea mai mare
+
+
+select*
+from
+(select cod_reteta_p, sum(pret_p*cantitate_p) valoare
+from detalii_retete_p
+group by cod_reteta_p
+order by sum(pret_p*cantitate_p) desc)
+where rownum<=2;
+
+
+--5 sa se afiseze codul retetei,id-ul, numele, prenumele clientului, diagnosticul si nr de retete cu diagnosticul respectiv
+
+
+select r.cod_reteta_p,c.id_client_p, c.nume_p,c.prenume_p, r.diagnostic_p, (select count(cod_reteta_p) from retete_p where diagnostic_p=r.diagnostic_p) nr_retete
+from clienti_p c, retete_p r
+where c.id_client_p=r.id_client_p;
+
+
+
+
+
+--Subiecte test
+
+1. Dublează discountul aplicat primilor 3 clienți care au avut rețetele cele mai valoroase 
+update carduri_fidelitate_p
+set discount_p=discount_p*2
+where id_client_p in
+(
+select id_client_p
+from
+(select c.id_client_p, sum(d.pret_p*d.cantitate_p) valoare
+from clienti_p c, retete_p r, detalii_retete_p d
+where c.id_client_p=r.id_client_p and r.cod_reteta_p=d.cod_reteta_p
+group by c.id_client_p
+order by sum(d.pret_p*d.cantitate_p) desc
+)
+where rownum<=3
+);
+
+
+2. Afișează medicamentele care au fost incluse în cel puțin 3 rețete ale clienților din București 
+
+select c.id_client_p, m.cod_medicament_p,m. denumire_medicament_p 
+from clienti_p c, retete_p r, detalii_retete_p d, medicamente_p m
+where c.id_client_p=r.id_client_p and r.cod_reteta_p=d.cod_reteta_p and d.cod_medicament_p=m.cod_medicament_p and c.localitate_p='Bucuresti' and m.cod_medicament_p in
+(  select m.cod_medicament_p
+    from medicamente_p m, detalii_retete_p d
+    where m.cod_medicament_p=d.cod_medicament_p 
+    group by m.cod_medicament_p
+    having count(d.cod_reteta_p)>=3
+)
+
+
+//NU MERGE
+3. Construiește o interogare care să conțină: o joncțiune externă la stânga, funcția CASE și o funcție scalară
+-- sa se afiseze id-ul, numele si prenumele cu litere mari ale clientului, sexul si sa se schimbe telefonul astfel: pentru femei telefonul devine 'Invalid',
+-- in rest telefonul ramane acelasi, pentru clientii care au cerut retete, dar si pt cei care nu au retete
+select c.id_client_p, upper(c.nume_p), upper(c.prenume_p) ,c.sex_p, case
+when c.sex_p='F' then c.telefon_p='invalid'
+else c.telefon_p
+end tel_nou
+from clienti_p c, retete_p r
+where c.id_client_p=r.id_client_p(+);
+
+
+//NOU->MERGE
+3. Construiește o interogare care să conțină: o joncțiune externă la stânga, funcția CASE și o funcție scalară
+Sa se afiseze id-ul, numele si prenumele cu litere mari ale clientului, sexul ,iar pentru clientii care incep prenumele  cu litera A sa se afiseze emailul, pentru clientii care incep prenumele cu V sa se afiseze telefonul, iar pentru restul localitatea, atat pentru clientii care au cerut retete, dar si pt cei care nu au retete.
+
+select c.id_client_p, upper(c.nume_p), upper(c.prenume_p) ,c.sex_p, case
+when c.prenume_p like 'A%' then c.email_client_p
+when c.prenume_p like 'V%' then c.telefon_p
+else c.localitate_p
+end afisare
+from clienti_p c, retete_p r
+where c.id_client_p=r.id_client_p(+);
+
+
+
+
+
+
+
+--TABELE VIRTUALE
+
+--1. Sa se creeze o tabela virtuala care contine clientii nascuti in anul 2000
+create or replace view clienti_2000
+as select* 
+from clienti_p
+where extract(year from  data_nasterii_p)=2000;
+
+select* from clienti_2000;
+
+
+
+--2. Sa se creeze o tabela virtuala(nu permite modificari) care contine clientii care au carduri de fidelitate 
+create or replace view clienti_cf
+as select* from clienti_p
+where id_client_p in
+(select c.id_client_p
+from clienti_p c, carduri_fidelitate_p f
+where c.id_client_p=f.id_client_p
+)
+with read only;
+
+select* from clienti_cf;
+
+
+--3 Sa se creeze o tabela virtuala care contine pentru fiecare medicament: denumirea, substanta activa si cantitatea totala in care a fost inclus in retete
+create or replace view medicament_nou
+as SELECT denumire_medicament_p, substanta_activa_p, cantitate_p FROM medicamente_p join detalii_retete_p using (cod_medicament_p)
+where (denumire_medicament_p,substanta_activa_p, cantitate_p)in (select denumire_medicament_p,substanta_activa_p, cantitate_p
+                                                FROM medicamente_p join detalii_retete_p using (cod_medicament_p));
+
+ select* from medicament_nou;  
+
+
+--4 Sa se creeze o tabela virtuala(nu permite modificari) care contine clientii care au avut cel putin 2 retete la farmacie
+create or replace view clienti_2
+as
+SELECT * FROM clienti_p where id_client_p in (select c.id_client_p
+from clienti_p c, retete_p r 
+where c.id_client_p=r.id_client_p
+group by c.id_client_p
+having count(r.id_client_p)>=2)
+WITH READ ONLY;
+
+select* from client_2;
+
+
+
+--5 Sa se creeze o tabela virtuala care contine producatorii de tip SRL care au aprovizionat cu medicamente farmacia
+create or replace view prod_2
+as select* from producatori_p where nume_producator_p like '%SRL' and id_producator_p in
+(select p.id_producator_p from producatori_p p, medicamente_p m where p.id_producator_p=m.id_producator_p )
+
+select* from prod_2;
+
+
+
+
+
+SECVENTE/INDESCI/SINONIME
+
+-- 1 Sa se creeze o secventa pentru tabela clienti care porneste de la 110, incrementeaza cu 1, are valoarea maxima de 200 si este nocycle.
+create sequence id_client_seq
+increment by 1 
+start with 110
+maxvalue 200
+nocycle;
+
+SELECT sequence_name, min_value, max_value, increment_by,
+last_number
+FROM user_sequences;
+
+
+
+--2 Sa se creeze un index pentru tabela retete(id_client).
+create index retete_id_client_idx
+on retete_p(id_client_p);
+
+
+-- 3 Sa se creeze un sinonim pentru tabela carduri_fidelitate;
+create synonym cf 
+for carduri_fidelitate_p;
+
+select* 
+from cf;
+
+
+
+
+         
